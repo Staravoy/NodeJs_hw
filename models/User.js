@@ -1,4 +1,3 @@
-// models/user.model.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -18,7 +17,8 @@ const userSchema = new Schema({
     default: 'starter'
   },
   token: {
-    type: String}
+    type: String
+  }
 });
 
 const User = mongoose.model('User', userSchema);

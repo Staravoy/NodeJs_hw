@@ -14,8 +14,9 @@ const addSchema = Joi.object({
 
 // обробка запитів для роботи з контактами
 const getAllContacts = async (req, res, next) => {
+  const userId = req.user.id;
     try {
-      const result = await Contact.find();
+      const result = await Contact.find({ owner: userId });
       res.json(result);
     } catch (error) {
       next(error);
@@ -35,30 +36,34 @@ const getContactById =  async (req, res, next) => {
     }
   };
 
-const newContact =  async (req, res, next) => {
+  const newContact = async (req, res, next) => {
     try {
-      const { error } = addSchema.validate(req.body);
-  
-      if (error) {
-        let name_error = '';
-  
-        if (error.details && error.details.length > 0) {
-          name_error = error.details[0].path[0];
+        // Отримайте ідентифікатор користувача з req.user
+        const userId = req.user.id;
+
+        const { error } = addSchema.validate(req.body);
+
+        if (error) {
+            let name_error = '';
+
+            if (error.details && error.details.length > 0) {
+                name_error = error.details[0].path[0];
+            }
+
+            if (name_error === 'phone') {
+                throw new HttpError(400, `Не правильний формат поля phone. Формат:(000) 000-0000`);
+            } else {
+                throw new HttpError(400, `відсутнє поле ${name_error}`);
+            }
+
         }
-  
-        if (name_error === 'phone') {
-          throw new HttpError(400, `Не правильний формат поля phone. Формат:(000) 000-0000`);
-        } else {
-          throw new HttpError(400, `відсутнє поле ${name_error}`);
-        }
-      }
-  
-      const result = await Contact.create(req.body);
-      res.status(201).json(result);
+        const result = await Contact.create({ ...req.body, owner: userId });
+        res.status(201).json(result);
     } catch (error) {
-      next(error);
+        next(error);
     }
-  }
+}
+
 
 const deleteContact = async (req, res, next) => {
   try {
