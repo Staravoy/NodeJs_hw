@@ -1,7 +1,7 @@
 const Joi = require('joi'); // метод валадації сталих виразів
 const Contact = require("../models/Contact") // підключення до БД через Contact.js
 const { HttpError } = require('../helpers'); // обробка помилок
-
+const User = require('../models/User')
 
 // валідація запиту по схемі joi
 const phonePattern = /^\(\d{3}\) \d{3}-\d{4}$/
@@ -14,7 +14,8 @@ const addSchema = Joi.object({
 
 // обробка запитів для роботи з контактами
 const getAllContacts = async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.params.userId;
+  console.log(userId)
     try {
       const result = await Contact.find({ owner: userId });
       res.json(result);
@@ -39,7 +40,8 @@ const getContactById =  async (req, res, next) => {
   const newContact = async (req, res, next) => {
     try {
         // Отримайте ідентифікатор користувача з req.user
-        const userId = req.user.id;
+        const userId = req.params.userId;
+        console.log(userId)
 
         const { error } = addSchema.validate(req.body);
 
