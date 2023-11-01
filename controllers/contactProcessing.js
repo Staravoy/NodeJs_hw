@@ -1,7 +1,7 @@
 const Joi = require('joi'); // метод валадації сталих виразів
 const Contact = require("../models/Contact") // підключення до БД через Contact.js
 const { HttpError } = require('../helpers'); // обробка помилок
-const User = require('../models/User')
+const checkToken = require('../middlewares/authMiddleware')
 
 // валідація запиту по схемі joi
 const phonePattern = /^\(\d{3}\) \d{3}-\d{4}$/
