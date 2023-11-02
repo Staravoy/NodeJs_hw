@@ -4,7 +4,7 @@ const { HttpError } = require('../helpers'); // обробка помилок
 const checkToken = require('../middlewares/authMiddleware')
 
 // валідація запиту по схемі joi
-const phonePattern = /^\(\d{3}\) \d{3}-\d{4}$/
+const phonePattern = /^\(\d{3}\)\d{3}-\d{4}$/
 const addSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -14,7 +14,7 @@ const addSchema = Joi.object({
 
 // обробка запитів для роботи з контактами
 const getAllContacts = async (req, res, next) => {
-  const userId = req.params.userId;
+  const userId = req.userId;
   console.log(userId)
     try {
       const result = await Contact.find({ owner: userId });
@@ -37,10 +37,10 @@ const getContactById =  async (req, res, next) => {
     }
   };
 
-  const newContact = async (req, res, next) => {
+const newContact = async (req, res, next) => {
     try {
         // Отримайте ідентифікатор користувача з req.user
-        const userId = req.params.userId;
+        const userId = req.userId;
         console.log(userId)
 
         const { error } = addSchema.validate(req.body);
@@ -53,7 +53,7 @@ const getContactById =  async (req, res, next) => {
             }
 
             if (name_error === 'phone') {
-                throw new HttpError(400, `Не правильний формат поля phone. Формат:(000) 000-0000`);
+                throw new HttpError(400, `Не правильний формат поля phone. Формат:(000)000-0000`);
             } else {
                 throw new HttpError(400, `відсутнє поле ${name_error}`);
             }
