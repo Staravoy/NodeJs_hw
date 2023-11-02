@@ -15,7 +15,7 @@ const addSchema = Joi.object({
 // обробка запитів для роботи з контактами
 const getAllContacts = async (req, res, next) => {
   const userId = req.userId;
-  console.log(userId)
+  console.log(`Отриманий id користувача: ${userId}`)
     try {
       const result = await Contact.find({ owner: userId });
       res.json(result);
@@ -41,7 +41,7 @@ const newContact = async (req, res, next) => {
     try {
         // Отримайте ідентифікатор користувача з req.user
         const userId = req.userId;
-        console.log(userId)
+        console.log(`Отриманий id користувача: ${userId}`)
 
         const { error } = addSchema.validate(req.body);
 
