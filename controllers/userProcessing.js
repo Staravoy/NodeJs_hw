@@ -3,12 +3,16 @@ const Joi = require('joi');
 const bcrypt = require('bcryptjs'); // бібліотека для хешування 
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
+const fs = require('fs/promises')
+const path = require('path')
 // локальні імпорти
 const { HttpError } = require('../helpers'); // обробка помилок
 const User = require('../models/User');
 const checkToken = require('../middlewares/authMiddleware');
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+const avatarsPath = path.resolve("pablic", "avatars")
  
 const addSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -18,6 +22,11 @@ const addSchema = Joi.object({
 const register = async (req, res, next) => {
     try {
       const { email, password } = req.body;
+      // Робота з зображенням
+      const { path: oldPath, filename } = req.file;
+      const newPath = path.join(avatarsPath, filename)
+      await fs.rename(oldPath, newPath)
+      const avatar = path.join("pablic","avatars", filename)
        // Перевірка на відсутність обох полів email та password
         if (!email || !password) {
           throw new HttpError(400, 'Потрібно заповнити всі поля');
@@ -43,7 +52,8 @@ const register = async (req, res, next) => {
     const user = new User({
       email,
       password: hashedPassword,
-      subscription: 'starter'
+      subscription: 'starter',
+      avatar: avatar
     });
 
     await user.save();

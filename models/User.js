@@ -11,6 +11,11 @@ const userSchema = new Schema({
     required: [true, 'Email is required'],
     unique: true
   },
+  avatar: {
+    type: String,
+    required: true
+  },
+  
   subscription: {
     type: String,
     enum: ['starter', 'pro', 'business'],
