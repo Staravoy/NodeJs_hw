@@ -5,10 +5,12 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const fs = require('fs/promises')
 const path = require('path')
+const gravatar = require('gravatar') //аватар заглушка
+ const jimp = require('jimp');
 // локальні імпорти
 const { HttpError } = require('../helpers'); // обробка помилок
 const User = require('../models/User');
-const checkToken = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/upload');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -22,11 +24,7 @@ const addSchema = Joi.object({
 const register = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      // Робота з зображенням
-      const { path: oldPath, filename } = req.file;
-      const newPath = path.join(avatarsPath, filename)
-      await fs.rename(oldPath, newPath)
-      const avatar = path.join("pablic","avatars", filename)
+
        // Перевірка на відсутність обох полів email та password
         if (!email || !password) {
           throw new HttpError(400, 'Потрібно заповнити всі поля');
@@ -46,14 +44,15 @@ const register = async (req, res, next) => {
     }
 
     // Хешування паролю
-    const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const avatarURL = gravatar.url(email)
 
     // Створення нового користувача
     const user = new User({
       email,
       password: hashedPassword,
       subscription: 'starter',
-      avatar: avatar
+      avatar: avatarURL
     });
 
     await user.save();
@@ -141,26 +140,40 @@ const corentUserData = async (req, res, next) => {
   }
 };
 
+const updateAvatar = async (req, res, next) => {
+  try {
+    const { path: tempUpload, originalname } = req.file;
+    const resultUpload = path.join(avatarsPath, originalname);
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("avatars", originalname);
+
+    // Обробка аватару за допомогою jimp
+    const jimpImage = await jimp.read(resultUpload);
+    await jimpImage.resize(250, 250).write(resultUpload);
+
+    const user = await User.findOneAndUpdate(
+      { _id: req.userId },
+      { avatar: avatarURL },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    res.json({ avatarURL, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 module.exports = {
   register,
   login,
   logout,
   corentUserData,
- 
+  updateAvatar,
 };
 
-// // Функція для оновлення статусу контакту
-// async function updateTokenStatus(contactId, updateFields) {
-//   try {
-//     const updatedContact = await User.findByIdAndUpdate(
-//       contactId,
-//       { $set: updateFields },
-//       { new: true }
-//     );
-
-//     return updatedContact;
-//   } catch (error) {
-//     throw new HttpError(500, 'Внутрішня помилка серверу');
-//   }
-// }

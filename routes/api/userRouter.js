@@ -10,6 +10,7 @@ router.post('/register', upload.single("avatars"), controller.userRegister); // 
 router.post('/login', controller.userLogin)//
 router.post('/logout', checkToken, controller.userLogout);
 router.post('/current', checkToken, controller.corentUserData);
+router.patch('/avatars', checkToken, upload.single("avatar"), controller.updateAvatar)
 
 
 

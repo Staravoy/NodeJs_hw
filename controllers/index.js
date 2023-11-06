@@ -1,6 +1,5 @@
 const contactProcessing = require('./contactProcessing') // дії з контактами
 const userProcessing = require('./userProcessing')// дії з користувачем
-const checkToken = require('../middlewares/authMiddleware')
 
 
 // обробка запитів для роботи з контактами
@@ -16,6 +15,7 @@ const userRegister = userProcessing.register;
 const userLogin = userProcessing.login
 const userLogout = userProcessing.logout
 const corentUserData = userProcessing.corentUserData
+const updateAvatar = userProcessing.updateAvatar
 
 module.exports = {
     getAllContacts,
@@ -28,4 +28,5 @@ module.exports = {
     userLogin,
     userLogout,
     corentUserData,
+    updateAvatar,
 }
