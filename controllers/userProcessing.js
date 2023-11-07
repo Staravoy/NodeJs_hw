@@ -161,13 +161,11 @@ const updateAvatar = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    res.json({ avatarURL, user });
+    res.json({ avatarURL });
   } catch (error) {
     next(error);
   }
 };
-
-
 
 module.exports = {
   register,
