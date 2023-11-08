@@ -6,9 +6,10 @@ const dotenv = require('dotenv').config();
 const fs = require('fs/promises')
 const path = require('path')
 const gravatar = require('gravatar') //аватар заглушка
- const jimp = require('jimp');
+const jimp = require('jimp');
+const {nanoid} = require('nanoid');
 // локальні імпорти
-const { HttpError } = require('../helpers'); // обробка помилок
+const { HttpError, sendEmail } = require('../helpers'); // обробка помилок
 const User = require('../models/User');
 const upload = require('../middlewares/upload');
 
@@ -47,15 +48,24 @@ const register = async (req, res, next) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       const avatarURL = gravatar.url(email)
 
+
+    // Верефікація електронної адреси
+    const verificationCode = nanoid()
     // Створення нового користувача
     const user = new User({
       email,
       password: hashedPassword,
       subscription: 'starter',
-      avatar: avatarURL
+      avatar: avatarURL,
+      verificationCode,
     });
-
     await user.save();
+      const veryfyEmail = {
+        to: email,
+        subject: "Перевірка email",
+        html: `<a target="_blank" href="http://localhost:3000/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
+      } 
+      await sendEmail(veryfyEmail);
     res.status(201).json({ user: { email: user.email, subscription: user.subscription } });
   } catch (error) {
     next(error);
