@@ -1,5 +1,5 @@
 const HttpError = require("./HttpErorr");
-const sendEmail = require("./sendEmail");// Corrected import statement
+const sendEmail = require('./sendemail')
 
 module.exports = {
     HttpError,

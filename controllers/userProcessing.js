@@ -9,7 +9,7 @@ const gravatar = require('gravatar') //аватар заглушка
 const jimp = require('jimp');
 const {nanoid} = require('nanoid');
 // локальні імпорти
-const { HttpError, sendEmail } = require('../helpers'); // обробка помилок
+const { HttpError, sendEmail } = require('../helpers'); // обробка помилок 
 const User = require('../models/User');
 const upload = require('../middlewares/upload');
 
@@ -63,9 +63,11 @@ const register = async (req, res, next) => {
       const veryfyEmail = {
         to: email,
         subject: "Перевірка email",
-        html: `<a target="_blank" href="http://localhost:3000/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
+        html: `<a target="
+        _blank" href="http://localhost:3000/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
       } 
       await sendEmail(veryfyEmail);
+
     res.status(201).json({ user: { email: user.email, subscription: user.subscription } });
   } catch (error) {
     next(error);
@@ -127,8 +129,6 @@ const logout = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 const corentUserData = async (req, res, next) => {
   try {

@@ -1,7 +1,10 @@
-const nodemailer = require("nodemailer");
-const dotenv = require('dotenv');
+const nodemailer = require('nodemailer')
+const dotenv = require('dotenv').config();
 
 const { UKR_NET_PASSWORD, UKR_NET_EMAIL } = process.env
+
+// console.log(UKR_NET_EMAIL)
+// console.log(UKR_NET_PASSWORD)
 
 const nodemailerConfig = {
     host: "smtp.ukr.net",
@@ -11,17 +14,17 @@ const nodemailerConfig = {
         user: UKR_NET_EMAIL,
         pass: UKR_NET_PASSWORD,
     }
+   
 }
+
 
 const transport = nodemailer.createTransport(nodemailerConfig);
 
-const email = {
-    from: UKR_NET_EMAIL,
-    to: "staravoy@outlook.com",
-    subject: "Test email",
-    html: "<strong>Test email</strong>"
-}
+const sendEmail = async (data) => {
+    const email = { ...data, from: UKR_NET_EMAIL };
+    return await transport.sendMail(email);
+};
 
-transport.sendMail(email)
-    .then(() => console.log("Лист відправленно!"))
-    .catch(error => console.log(error.message))
+
+module.exports = sendEmail;
+
