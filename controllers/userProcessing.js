@@ -13,7 +13,7 @@ const { HttpError, sendEmail } = require('../helpers'); // обробка пом
 const User = require('../models/User');
 const upload = require('../middlewares/upload');
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const {JWT_SECRET, BASE_URL} = process.env;
 
 const avatarsPath = path.resolve("pablic", "avatars")
  
@@ -64,7 +64,7 @@ const register = async (req, res, next) => {
         to: email,
         subject: "Перевірка email",
         html: `<a target="
-        _blank" href="http://localhost:3000/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
+        _blank" href="${BASE_URL}/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
       } 
       await sendEmail(veryfyEmail);
 
@@ -74,6 +74,30 @@ const register = async (req, res, next) => {
   }
 };
 
+const verify = async (req, res, next) => {
+  console.log("Hello World!!! - 1")
+  const { verificationCode } = req.params;
+  console.log("Hello World!!! - 2")
+  try {
+    console.log("Hello World!!! - 3")
+    const user = await User.findOne({ verificationCode });
+    if (!user) {
+      throw new HttpError(404, 'Користувача не знайдено');
+    }
+    
+    await User.findByIdAndUpdate(user._id, { verify: true, verificationCode: "" });
+    
+    res.json({
+      message: "Перевірка email вдала."
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -81,6 +105,9 @@ const login = async (req, res, next) => {
   }
   try {
     const user = await User.findOne({ email: email }).exec();
+    if (!user.verify) {
+      return res.status(401).json({ message: 'Email не підтверджено' });
+    }
     if (user) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) {
@@ -179,6 +206,7 @@ const updateAvatar = async (req, res, next) => {
 
 module.exports = {
   register,
+  verify,
   login,
   logout,
   corentUserData,

@@ -16,6 +16,7 @@ const userLogin = userProcessing.login
 const userLogout = userProcessing.logout
 const corentUserData = userProcessing.corentUserData
 const updateAvatar = userProcessing.updateAvatar
+const verify = userProcessing.verify
 
 module.exports = {
     getAllContacts,
@@ -29,4 +30,5 @@ module.exports = {
     userLogout,
     corentUserData,
     updateAvatar,
+    verify,
 }
