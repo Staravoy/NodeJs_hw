@@ -64,7 +64,7 @@ const register = async (req, res, next) => {
         to: email,
         subject: "Перевірка email",
         html: `<a target="
-        _blank" href="${BASE_URL}/api/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
+        _blank" href="${BASE_URL}/api/users/auth/register/${verificationCode}">Натисніть для веріфікації email</a>`
       } 
       await sendEmail(veryfyEmail);
 
@@ -74,12 +74,9 @@ const register = async (req, res, next) => {
   }
 };
 
-const verify = async (req, res, next) => {
-  console.log("Hello World!!! - 1")
+const verifyEmail = async (req, res, next) => {
   const { verificationCode } = req.params;
-  console.log("Hello World!!! - 2")
   try {
-    console.log("Hello World!!! - 3")
     const user = await User.findOne({ verificationCode });
     if (!user) {
       throw new HttpError(404, 'Користувача не знайдено');
@@ -94,9 +91,6 @@ const verify = async (req, res, next) => {
     next(error);
   }
 };
-
-
-
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -206,7 +200,7 @@ const updateAvatar = async (req, res, next) => {
 
 module.exports = {
   register,
-  verify,
+  verifyEmail,
   login,
   logout,
   corentUserData,

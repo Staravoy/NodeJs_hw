@@ -11,7 +11,7 @@ router.post('/login', controller.userLogin)//
 router.post('/logout', checkToken, controller.userLogout);
 router.post('/current', checkToken, controller.corentUserData);
 router.patch('/avatars', checkToken, upload.single("avatar"), controller.updateAvatar)
-router.get("/auth/register/:verificationCode", controller.verify)
+router.get("/auth/register/:verificationCode", controller.verifyEmail)
 
 
 
